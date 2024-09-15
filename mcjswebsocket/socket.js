@@ -1,39 +1,29 @@
-const ws = require('nodejs-websocket')
-const PORT = 3003
+const WebSocket = require('ws')
+const uuid = require('uuid')
 
-const server = ws.createServer(con => {
-    data = {
-        "body":{
-            "origin":{
-                "type":"player"
-            },
-            "commandLine":"agent creat",
-            "version":1
-        },
-        "header":{
-            "requestId":"00000000-0000-0000-0000-000000000000",
-            "messagePurpose": "commandRequest",
-            "version": 1,
-            "messageType": "commandRequest"
-        }
-    }
-    con.send(JSON.stringify(data))
-    console.log('由用户连接')
-    con.on('error' ,data => {
-        console.log('有用户连接异常')
-    })
-    con.on('close',data => {
-        console.log('由用户连接关闭')
-    })
-    con.on('connection',data =>{
-        console.log('有用户连接')
-    })
-    con.on('text',data => {
-        con.send('ces')
-    })
-    
-})
+// Create a new websocket server on port 3000
+console.log('Ready. On MineCraft chat, type /connect localhost:3000')
+const wss = new WebSocket.Server({ port: 3003 })
 
-server.listen(PORT,()=>{
-    console.log('监听'+PORT)
+wss.on('connection', socket => {
+  console.log('Connected')
+
+  // Tell Minecraft to send all chat messages. Required once after Minecraft starts
+  socket.send(JSON.stringify({
+    "header": {
+      "version": 1,                   
+      "requestId": uuid.v4(),          
+      "messageType": "commandRequest",  
+      "messagePurpose": "subscribe"     
+    },
+    "body": {
+      "eventName": "PlayerMessage"     
+    },
+  }))
+
+  // When MineCraft sends a message (e.g. on player chat), print it.
+  socket.on('message', packet => {
+    const msg = JSON.parse(packet)
+    console.log(msg)
+  })
 })
