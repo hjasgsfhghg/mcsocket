@@ -26,4 +26,8 @@ wss.on('connection', socket => {
     const msg = JSON.parse(packet)
     console.log(msg)
   })
+    socket.on('ScreenHeartBeat', packet => {
+    const msg = JSON.parse(packet)
+    console.log(msg)
+  })
 })
