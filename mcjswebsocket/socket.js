@@ -20,13 +20,23 @@ wss.on('connection', socket => {
       "eventName": "PlayerMessage"     
     },
   }))
-
+  socket.send(JSON.stringify({
+    "header": {
+      "version": 1,                   
+      "requestId": uuid.v4(),          
+      "messageType": "commandRequest",  
+      "messagePurpose": "subscribe"     
+    },
+    "body": {
+      "eventName": "ScreenHeartBeat"     
+    },
+  }))
   // When MineCraft sends a message (e.g. on player chat), print it.
   socket.on('message', packet => {
     const msg = JSON.parse(packet)
     console.log(msg)
   })
-    socket.on('ScreenHeartBeat', packet => {
+    socket.on('update', packet => {
     const msg = JSON.parse(packet)
     console.log(msg)
   })
